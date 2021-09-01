@@ -3,7 +3,7 @@
   $host     = 'localhost'; // 호스트 주소
   $database = 'testDB';  // 데이터베이스 이름
   $user     = 'root';      // DB 유저이름
-  $password = 'oracion1@';      // DB 패스워드
+  $password = '123456';      // DB 패스워드
  
   // PDO방식 DB 연결
   try {

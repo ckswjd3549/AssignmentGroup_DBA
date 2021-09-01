@@ -25,7 +25,7 @@ function ID_search(){
     global $PDO;
     $id = ($_POST['id']);
     $password = ($_POST['password']);
-    $result = $PDO->query("SELECT* FROM account");
+    $result = $PDO->query("SELECT * FROM account");
     $_SESSION['Loggedin'] = false;
     
     $message = "Id doesn't exist or wrong password";
