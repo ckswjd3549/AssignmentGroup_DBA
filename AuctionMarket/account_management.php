@@ -32,12 +32,12 @@ function ID_search(){
     foreach ($result as $row){
         if($id === $row["email"] && $password === $row["password"]){
             $_SESSION['Loggedin'] = true;
-            header('location: user_page.php');
+            header('location: home.php');
             break;
         }
         else if($id === $row["phone"] && $password === $row["password"]){
                 $_SESSION['Loggedin'] = true;
-                header('location: user_page.php');
+                header('location: home.php');
                 break;
         }
     }   
