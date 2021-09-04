@@ -17,12 +17,13 @@ CREATE TABLE IF NOT EXISTS account(
     password varchar(30) NOT NULL,
     first_name varchar(30) NOT NULL,
     last_name varchar(30) NOT NULL,
-    id INT(30) NOT NULL,
+    id_num varchar(30) NOT NULL,
+    id INT NOT NULL,
     address varchar(200) NOT NULL,
     city varchar(30) NOT NULL,
     country varchar(30) NOT NULL,
-    profile_image text NOT NULL,
     balance float NOT NULL,
+    admin boolean default false,
     UNIQUE(id, email, phone)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
