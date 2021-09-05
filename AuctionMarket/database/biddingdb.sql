@@ -2,7 +2,7 @@
 # CREATE SCHEMA bidding_system;
 # USE bidding_system;
 CREATE TABLE IF NOT EXISTS branch(
-    code INT(30) NOT NULL,
+    code INT NOT NULL,
     name varchar(30) NOT NULL,
     address varchar(30) NOT NULL,
     hotline_number varchar(15) NOT NULL,
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS account(
 
 -- Table structure for table bidding
 CREATE TABLE IF NOT EXISTS bidding(
-    id INT(30) NOT NULL,
+    id INT NOT NULL,
     user_id VARCHAR(30) NOT NULL,
     product_id VARCHAR(30) NOT NULL,
     amount float NOT NULL,
@@ -40,14 +40,14 @@ CREATE TABLE IF NOT EXISTS bidding(
 
 -- Table structure for table category
 CREATE TABLE IF NOT EXISTS category(
-    id INT(30) NOT NULL,
+    id INT NOT NULL,
     name VARCHAR(30) NOT NULL,
     UNIQUE(id, name)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Table structure for table product
 CREATE TABLE IF NOT EXISTS product(
-    id INT(30) NOT NULL,
+    id INT NOT NULL,
     category_id VARCHAR(30) NOT NULL,
     name VARCHAR(30) NOT NULL,
     description TEXT NOT NULL,
@@ -87,21 +87,20 @@ ALTER TABLE account
 
 -- AUTO_INCREMENT for table bidding
 ALTER TABLE bidding
-    MODIFY id INT(30) NOT NULL AUTO_INCREMENT;
+    MODIFY id INT NOT NULL AUTO_INCREMENT;
 
 -- AUTO_INCREMENT for table category
-ALTER TABLE category
-    MODIFY id INT(30) NOT NULL AUTO_INCREMENT;
+insert into category(`name`) values('a');
 
 -- AUTO_INCREMENT for table product
 ALTER TABLE product
-    MODIFY id INT(30) NOT NULL AUTO_INCREMENT;
+    MODIFY id INT NOT NULL AUTO_INCREMENT;
 
 -- AUTO_INCREMENT for table branch
 ALTER TABLE branch
-    MODIFY code INT(30) NOT NULL AUTO_INCREMENT;
+    MODIFY code INT NOT NULL AUTO_INCREMENT;
 
 -- AUTO_INCREMENT for table account
 ALTER TABLE account
-    MODIFY id INT(30) NOT NULL AUTO_INCREMENT;
+    MODIFY id INT NOT NULL AUTO_INCREMENT;
 
