@@ -20,7 +20,8 @@ if(isset($_GET['id'])){
     <img src="admin/assets/uploads/<?php echo $image ?>" class="d-flex w-100" alt="">
     <p>Name: <large><b><?php echo $name ?></b></large></p>
     <p>Category: <b><?php echo $category ?></b></p>
-    <p>Starting Amount: <b><?php echo number_format($bid_start_time,2) ?></b></p>
+    <p>Starting Amount: <b><?php echo number_format($start_bid,2) ?></b></p>
+    <p>Start: <b><?php echo date("m d,Y h:i A",strtotime($bid_start_time)) ?></b></p>
     <p>Until: <b><?php echo date("m d,Y h:i A",strtotime($bid_end_time)) ?></b></p>
     <p>Highest Bid: <b id="hbid"><?php echo number_format($price,2) ?></b></p>
     <p>Description:</p>
