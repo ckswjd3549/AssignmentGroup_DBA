@@ -4,33 +4,24 @@
 
 include_once("pdo_connect.php");
 include_once("account_management.php");
+
+
 $_SESSION['register_request'] = false;
 
 
-
-echo 'register';
-var_dump($_POST);
-
 if(Info_check() == true){
     ID_register();
-    table();
-
-
+	sleep(3);
+    echo "<meta http-equiv='refresh' content='3;url=index.php?'>";
 
 }
-var_dump($_SESSION);
 
 
+if(($_SESSION['register_request']) == true){
+    add_account();
+	echo 'updated';
+}
 
-// if(isset($_SESSION['regieter_request']) == true){
-//     echo 'test';
-
-
-
-
-
-
-    
 
 ?>
 
