@@ -3,11 +3,12 @@ session_start();
 
 include_once("pdo_connect.php");
 
-
-
-
-
 $_SESSION['Loggedin'] = false;
+
+
+
+
+
 
 
 function add_account(){
