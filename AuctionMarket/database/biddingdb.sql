@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS product(
     bid_end_time datetime NOT NULL,
     image text NOT NULL,
     date_created datetime NOT NULL DEFAULT current_timestamp(),
-    UNIQUE(id, category_id, name)
+    UNIQUE(id, category_id, name, bid_end_time)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 # DROP TABLE IF EXISTS account;
@@ -76,7 +76,7 @@ ALTER TABLE category
 
 -- Indexes for table product
 ALTER TABLE product
-    ADD PRIMARY KEY (id);
+    ADD PRIMARY KEY (id, bid_end_time);
 
 -- Indexes for table product
 ALTER TABLE branch
@@ -105,4 +105,33 @@ ALTER TABLE branch
 -- AUTO_INCREMENT for table account
 ALTER TABLE account
     MODIFY id INT(30) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE account
+    ADD INDEX idx_country (country);
+SELECT * from account where country = 'Vietnam';
+
+ALTER TABLE product
+    ADD INDEX idx_name (name);
+SELECT * from product where name like 'New%';
+
+ALTER TABLE product
+    PARTITION BY RANGE COLUMNS(bid_end_time)(
+    PARTITION p0 VALUES LESS THAN ('2020-01-01'),
+    PARTITION p1 VALUES LESS THAN ('2020-03-01'),
+    PARTITION p2 VALUES LESS THAN ('2020-04-01'),
+    PARTITION p3 VALUES LESS THAN ('2020-06-01'),
+    PARTITION p4 VALUES LESS THAN ('2020-07-01'),
+    PARTITION p5 VALUES LESS THAN ('2020-10-01'),
+    PARTITION p6 VALUES LESS THAN ('2020-11-01'),
+    PARTITION p7 VALUES LESS THAN ('2020-12-01')
+    );
+
+ALTER TABLE account
+    PARTITION BY RANGE (id)(
+    PARTITION p0 VALUES LESS THAN (10),
+    PARTITION p1 VALUES LESS THAN (20),
+    PARTITION p2 VALUES LESS THAN (30),
+    PARTITION p3 VALUES LESS THAN (40),
+    PARTITION p4 VALUES LESS THAN (maxvalue)
+    );
 
