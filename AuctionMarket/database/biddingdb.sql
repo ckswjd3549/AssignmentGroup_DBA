@@ -12,19 +12,19 @@ CREATE TABLE IF NOT EXISTS branch(
 -- Table structure for table account
 
 CREATE TABLE IF NOT EXISTS account(
-    email varchar(200) NOT NULL,
-    phone varchar(30) NOT NULL,
-    password varchar(30) NOT NULL,
-    first_name varchar(30) NOT NULL,
-    last_name varchar(30) NOT NULL,
-    id_num varchar(30) NOT NULL,
-    id INT NOT NULL,
-    address varchar(200) NOT NULL,
-    city varchar(30) NOT NULL,
-    country varchar(30) NOT NULL,
-    balance float NOT NULL,
-    admin boolean default false,
-    UNIQUE(id, email, phone)
+    Email varchar(200) NOT NULL,
+    Phone varchar(30) NOT NULL,
+    Password varchar(30) NOT NULL,
+    First_name varchar(30) NOT NULL,
+    Last_name varchar(30) NOT NULL,
+    Id_num varchar(30) NOT NULL,
+    UID INT NOT NULL,
+    Address varchar(200) NOT NULL,
+    Aity varchar(30) NOT NULL,
+    Country varchar(30) NOT NULL,
+    Balance float NOT NULL,
+    Admin boolean default false,
+    UNIQUE(UID, Email, Phone)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Table structure for table bidding

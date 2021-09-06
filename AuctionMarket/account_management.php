@@ -3,12 +3,177 @@ session_start();
 
 include_once("pdo_connect.php");
 
-$_SESSION['Loggedin'] = false;
 
 
 
 
 
+
+function delete_account(){
+
+
+    global $PDO;
+    extract($_POST);
+    $delete = $PDO->query("DELETE FROM account where id = " . $uid);
+  
+
+}
+
+function update_account(){
+    global $PDO;
+    $uid = ($_POST['uid']);
+    $coulmn = ($_POST['coulmn']);
+    $value = ($_POST['value']);
+
+    $result = $PDO->query("SELECT* FROM account");
+    $_SESSION['UID_coulmn_check'] = false;
+
+    $message = "UID doesn't exist";
+    foreach ($result as $row){
+        if($uid == $row["UID"] ){
+            if(isset($row[$coulmn])){
+                $_SESSION['UID_coulmn_check'] = true;
+                break;
+            }   
+            else 
+            $message ="Coulmn doesn't exist";
+            echo $message;
+            echo "<meta http-equiv='refresh' content='3;url=admin_page.php?'>";
+            break;
+        
+        }
+        else 
+        echo $message;
+        echo "<meta http-equiv='refresh' content='3;url=admin_page.php?'>";
+    }
+
+
+    $_SESSION['value_check'] = false;
+
+    if(isset($_SESSION['UID_coulmn_check']) == true){
+
+        switch ($coulmn){
+            case 'Email':
+                if(filter_var($value, FILTER_VALIDATE_EMAIL) == true){
+                    $_SESSION['value_check'] = true;
+                    $_SESSION['UID_coulmn_check'] = false;
+                    break;
+                }
+                else 
+                    $message = "Please enter validate email";
+                    echo $message;
+                    $_SESSION['UID_coulmn_check'] = false;
+                    echo "<meta http-equiv='refresh' content='3;url=admin_page.php?'>";
+                    break;
+            case 'Phone' :
+                $valueNum = (int)$value;
+                if($valueNum != 0){
+                    $_SESSION['value_check'] = true;
+                    $_SESSION['UID_coulmn_check'] = false;
+                    echo($valueNum);    
+                    break;
+                }
+                else 
+                    $message = "Please enter only phone number(without - and whitespace)";
+                    echo $message;
+                    $_SESSION['UID_coulmn_check'] = false;
+                    echo "<meta http-equiv='refresh' content='3;url=admin_page.php?'>";
+                    break;
+            case 'UID':
+                $valueNum = (int)$value;
+                if($valueNum != 0){
+                    $_SESSION['value_check'] = true;
+                    $_SESSION['UID_coulmn_check'] = false;  
+                    break;
+                }
+                else 
+                    $message = "Please enter only number that upper than 0";
+                    echo $message;
+                    $_SESSION['UID_coulmn_check'] = false;
+                    echo "<meta http-equiv='refresh' content='3;url=admin_page.php?'>";
+                    break;
+
+            case 'Admin':
+                $message = "You can not adjust admin";
+                echo $message;
+                $_SESSION['UID_coulmn_check'] = false;
+                echo "<meta http-equiv='refresh' content='3;url=admin_page.php?'>";
+                break;
+                                    
+        }
+    }
+
+
+    
+    if(isset($_SESSION['value_check']) == true){
+        $sth =$PDO->prepare("UPDATE account set $coulmn = :value where UID = :uid");
+        $sth->execute(
+            [
+            ':value' => $value,
+            ':uid' => $uid
+            ]
+        );
+        $_SESSION['value_check'] = false;
+        $message = "Information updated";
+        echo $message;
+        sleep(3);
+        echo "<meta http-equiv='refresh' content='3;url=admin_page.php?'>";
+    }
+  
+    
+}
+
+
+function read_account(){
+
+    global $PDO;
+
+    $select = $PDO->query("SELECT * FROM account");
+    echo `<table class=’table table-hover’><tr>`;
+    foreach($select as $row) : ?>
+
+    <style>
+    table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    }
+    </style>
+
+    <table>
+        <tr>
+            <th>UID</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Password</th>
+            <th>First_name</th>
+            <th>Last_name</th>
+            <th>Id_num</th>
+            <th>Address</th>
+            <th>City</th>
+            <th>Country</th>
+            <th>Balance</th>
+            <th>Admin</th>
+        </tr>
+
+        <tr>
+            <td><?php echo $row['UID']; ?></td>
+            <td><?php echo $row['Email']; ?></td>
+            <td><?php echo $row['Phone']; ?></td>
+            <td><?php echo $row['Password']; ?></td>
+            <td><?php echo $row['First_name']; ?></td>
+            <td><?php echo $row['Last_name']; ?></td>
+            <td><?php echo $row['Id_num']; ?></td>
+            <td><?php echo $row['Address']; ?></td>
+            <td><?php echo $row['City']; ?></td>
+            <td><?php echo $row['Country']; ?></td>
+            <td><?php echo $row['Balance']; ?></td>
+            <td><?php echo $row['Admin']; ?></td>
+        </tr>
+
+    </table>
+
+    <?php endforeach;
+}
 
 
 function add_account(){
@@ -55,22 +220,26 @@ function ID_search(){
     
     $message = "Id doesn't exist or wrong password";
     foreach ($result as $row){
-        if($id === $row["email"] && $password === $row["password"]){
-            $_SESSION['Loggedin'] = true;
-            if($row["admin"] == true){
+        if($id === $row["Email"] && $password === $row["Password"]){
+            if($row["Admin"] == true){
+                $_SESSION['Loggedin'] = true;
                 header('location: admin_page.php');
                 break;
+
             }
+            $_SESSION['Loggedin'] = true;
             header('location: user_page.php');
             break;
             
         }
-        else if($id === $row["phone"] && $password === $row["password"]){
-                $_SESSION['Loggedin'] = true;
-                if($row["admin"] == true){
+        else if($id === $row["Phone"] && $password === $row["Password"]){
+               
+                if($row["Admin"] == true){
+                    $_SESSION['Loggedin'] = true;
                     header('location: admin_page.php');
                     break;
                 }
+                $_SESSION['Loggedin'] = true;
                 header('location: user_page.php');
                 break;
         }
