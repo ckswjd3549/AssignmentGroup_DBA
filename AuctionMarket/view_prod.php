@@ -70,8 +70,13 @@ if(isset($_GET['id'])){
         start_load()
         var latest = $('#hbid').text()
         latest = latest.replace(/,/g,'')
-        if(parseFloat(latest)  > $('[name="bid_amount"]').val()){
+        if(parseFloat(latest)  > $('[name="amount"]').val()){
             alert_toast("Bid amount must be greater than the current Highest Bid.",'danger')
+            end_load()
+            return false;
+        }
+        if(parseFloat(latest)  < $('[name="price"]').val()){
+            alert_toast("Bid amount must be greater than the minimum price.",'danger')
             end_load()
             return false;
         }
