@@ -2,8 +2,8 @@
 # CREATE SCHEMA bidding_system;
 # USE bidding_system;
 CREATE TABLE IF NOT EXISTS branch(
-    code INT NOT NULL,
-    name varchar(30) NOT NULL,
+                                     code INT NOT NULL,
+                                     name varchar(30) NOT NULL,
     address varchar(200) NOT NULL,
     hotline_number varchar(15) NOT NULL,
     UNIQUE(code, name)
@@ -66,18 +66,16 @@ CREATE TABLE IF NOT EXISTS product(
                                       id INT NOT NULL,
                                       category_id INT(30) NOT NULL,
     name VARCHAR(30) NOT NULL,
-    description TEXT NOT NULL,
     bid_start_time float NOT NULL,
     price float NOT NULL,
     bid_end_time datetime NOT NULL,
-    image text NOT NULL,
     date_created datetime NOT NULL DEFAULT current_timestamp(),
     UNIQUE(id, category_id, name)
     )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Dumping data for table product
-INSERT INTO product VALUES(1, 5, 'Sample Smart Phone', 'Sample only', 7000, 7000, '2020-10-27 19:00:00', '1.jpg', '2020-10-27 09:50:54'),
-                          (3, 1, 'Gadget Package', 'Sample ', 150000, 15000, '2020-10-27 17:00:00', '3.jpg', '2020-10-27 09:59:39');
+INSERT INTO product VALUES(1, 5, 'Sample Smart Phone',  7000, 7000, '2020-10-27 19:00:00', '2020-10-27 09:50:54'),
+                          (3, 1, 'Gadget Package',  150000, 15000, '2020-10-27 17:00:00', '2020-10-27 09:59:39');
 
 # DROP TABLE IF EXISTS account;
 # DROP TABLE IF EXISTS bidding;

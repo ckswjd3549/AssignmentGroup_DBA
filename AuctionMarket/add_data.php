@@ -15,7 +15,6 @@ $image = "asdfasdfa";
 
 //Use prepared statement
 $stmt = $pdo->prepare("INSERT INTO product_detail(description, image) VALUES (?, ?)");
-//$stmt = $pdo->prepare("UPDATE product SET description= ? AND image = ? WHERE id = 3");
 $stmt->execute([$description, $image]);
 
 $client = new MongoDB\Client('mongodb://localhost:27017');
