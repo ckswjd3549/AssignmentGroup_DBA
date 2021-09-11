@@ -13,38 +13,61 @@ CREATE TABLE IF NOT EXISTS branch(
 INSERT INTO branch values (1, 'Online bidding system', '702 Nguyen Van Linh, Tan Hung, Quan 7, Thanh pho Ho Chi Minh 700000', '0778139985');
 
 -- Table structure for table account
+-- 수정
 CREATE TABLE IF NOT EXISTS account(
-    email varchar(200) NOT NULL,
-    phone varchar(30) NOT NULL,
-    password varchar(30) NOT NULL,
-    first_name varchar(30) NOT NULL,
-    last_name varchar(30) NOT NULL,
-    id INT(30) NOT NULL,
-    address varchar(200) NOT NULL,
-    city varchar(30) NOT NULL,
-    country varchar(30) NOT NULL,
-    profile_image text NOT NULL,
-    balance float NOT NULL,
-    UNIQUE(id, email, phone)
-    )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    Email varchar(200) NOT NULL,
+    Phone varchar(30) NOT NULL,
+    Password varchar(30) NOT NULL,
+    First_name varchar(30) NOT NULL,
+    Last_name varchar(30) NOT NULL,
+    Id_num varchar(30) NOT NULL,
+    UID INT NOT NULL,
+    Address varchar(200) NOT NULL,
+    City varchar(30) NOT NULL,
+    Country varchar(30) NOT NULL,
+    Balance float NOT NULL,
+    Admin boolean default false,
+    UNIQUE(UID, Email, Phone)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Dumping data is automatically executed in register.php page.
 
 -- Table structure for table bidding
-CREATE TABLE IF NOT EXISTS bidding(
-                                      id INT NOT NULL,
-                                      user_id INT(30) NOT NULL,
-    product_id INT(30) NOT NULL,
-    amount INT NOT NULL,
-    status tinyint(1) NOT NULL DEFAULT 1 COMMENT '1=bid,2=confirmed,3=cancelled',
+-- 수정
+CREATE TABLE IF NOT EXISTS auction(
+    AID INT NOT NULL,
+    UID VARCHAR(30) NOT NULL,
+    Product VARCHAR(30) NOT NULL,
+    Amount float NOT NULL,
+    Status tinyint NOT NULL DEFAULT 1 ,
+    Closing_time datetime NOT NULL,
+    Date_created datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+    Ongoing boolean default false,
+	Bid_count INT NOT NULL default 0,
+    Latest_bidder INT not null default 0,
+    UNIQUE(AID, UID, Product)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE auction
+    ADD PRIMARY KEY (AID);
+ALTER TABLE auction
+    MODIFY AID INT NOT NULL AUTO_INCREMENT;
+
+-- 추가
+CREATE TABLE IF NOT EXISTS bidlist(
+	AID INT NOT NULL,
+	BID INT NOT NULL,
+	UID INT NOT NULL,	
+    Product VARCHAR(30) NOT NULL,
+    Amount float NOT NULL,
     date_created datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-    UNIQUE(id, user_id, product_id, amount)
+    UNIQUE(BID, UID, Product, Amount)
     )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- Dumping data for table bidding
-INSERT INTO bidding VALUES(1, 5, 1, 300, 1, '2020-10-27 14:18:50');
-INSERT INTO bidding VALUES(4, 5, 3, 155000, 1, '2020-10-27 16:37:29');
-
+ALTER TABLE bidlist
+    ADD PRIMARY KEY (BID, amount);
+ALTER TABLE bidlist
+    MODIFY BID INT NOT NULL AUTO_INCREMENT;
 -- Table structure for table category
 CREATE TABLE IF NOT EXISTS category(
                                        id INT NOT NULL,

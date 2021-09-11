@@ -1,6 +1,14 @@
 
 <?php
+
+
 include_once("pdo_connect.php");
+
+$_SESSION['Loggedin'] = false;
+
+
+
+var_dump($PDO);
 
 ?>
 

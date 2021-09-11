@@ -1,5 +1,8 @@
 <?php
-session_start();
+
+if(!isset($_SESSION)) {
+    session_start();
+}
 
 include_once("pdo_connect.php");
 
@@ -14,7 +17,7 @@ function delete_account(){
 
     global $PDO;
     extract($_POST);
-    $delete = $PDO->query("DELETE FROM account where id = " . $uid);
+    $delete = $PDO->query("DELETE FROM account where UID = " . $uid);
   
 
 }
@@ -42,15 +45,12 @@ function update_account(){
             break;
         
         }
-        else 
-        echo $message;
-        echo "<meta http-equiv='refresh' content='3;url=admin_page.php?'>";
     }
 
 
     $_SESSION['value_check'] = false;
 
-    if(isset($_SESSION['UID_coulmn_check']) == true){
+    if($_SESSION['UID_coulmn_check'] == true){
 
         switch ($coulmn){
             case 'Email':
@@ -102,10 +102,13 @@ function update_account(){
                                     
         }
     }
+    else 
+    echo $message;
+    echo "<meta http-equiv='refresh' content='3;url=admin_page.php?'>";
 
 
     
-    if(isset($_SESSION['value_check']) == true){
+    if($_SESSION['value_check']== true){
         $sth =$PDO->prepare("UPDATE account set $coulmn = :value where UID = :uid");
         $sth->execute(
             [
@@ -223,12 +226,17 @@ function ID_search(){
         if($id === $row["Email"] && $password === $row["Password"]){
             if($row["Admin"] == true){
                 $_SESSION['Loggedin'] = true;
+                $_SESSION['id'] = $id;
+                $_SESSION['password'] = $password;
                 header('location: admin_page.php');
                 break;
 
             }
             $_SESSION['Loggedin'] = true;
+            $_SESSION['id'] = $id;
+            $_SESSION['password'] = $password;
             header('location: user_page.php');
+
             break;
             
         }
@@ -236,10 +244,14 @@ function ID_search(){
                
                 if($row["Admin"] == true){
                     $_SESSION['Loggedin'] = true;
+                    $_SESSION['id'] = $id;
+                    $_SESSION['password'] = $password;
                     header('location: admin_page.php');
                     break;
                 }
                 $_SESSION['Loggedin'] = true;
+                $_SESSION['id'] = $id;
+                $_SESSION['password'] = $password;
                 header('location: user_page.php');
                 break;
         }
@@ -330,6 +342,60 @@ if (filter_var($email, FILTER_VALIDATE_EMAIL) != true) {
     echo $message;
 
 }
+
+
+function display_info(){
+    global $PDO;
+    $uid = $_SESSION['UID'];
+    $row = $PDO->prepare("SELECT* FROM account where UID = :uid");
+    $row -> execute(
+        [ 
+            ':uid' => $uid
+        ]
+        );
+    foreach ($row as $user) :?>
+
+        <style>
+        table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+        }
+        </style>
+    
+        <table>
+            <tr>
+                <th>UID</th>
+                <th>Balance</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Password</th>
+                <th>First_name</th>
+                <th>Last_name</th>
+                <th>Address</th>
+                <th>City</th>
+                <th>Country</th>
+            </tr>
+    
+            <tr>
+                <td><?php echo $user['UID']; ?></td>
+                <td><?php echo $user['Balance']; ?></td>
+                <td><?php echo $user['Email']; ?></td>
+                <td><?php echo $user['Phone']; ?></td>
+                <td><?php echo $user['Password']; ?></td>
+                <td><?php echo $user['First_name']; ?></td>
+                <td><?php echo $user['Last_name']; ?></td>
+                <td><?php echo $user['Address']; ?></td>
+                <td><?php echo $user['City']; ?></td>
+                <td><?php echo $user['Country']; ?></td>
+    
+            </tr>
+    
+        </table>
+    
+        <?php endforeach;
+        
+}
+
 
 
 
