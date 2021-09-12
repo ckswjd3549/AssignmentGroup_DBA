@@ -526,8 +526,8 @@ function bid_auction_progress(){
 
     // Check that amount is upper than current minimum amount of auction
     if(!$product == null){
-        $amountNum = (float)$amount;
-        $minimumNum = (float)$minimum_amount;
+        $amountNum = (int)$amount;
+        $minimumNum = (int)$minimum_amount;
         if(!($amountNum <= $minimumNum)){
             $_SESSION['amount_check'] = true;
         }
