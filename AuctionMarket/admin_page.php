@@ -46,7 +46,7 @@ if(array_key_exists('btn_delete_ac',$_POST)){
 
     delete_account();
     unset($_POST['uid']);
-    var_dump($_POST);
+
 
 }
 
@@ -73,6 +73,11 @@ if(array_key_exists('update_au',$_POST)){
         <input name="status" type="text" placeholder="Enter the number to update"><br>
         <button type="submit" name="btn_update_au">Submit</button>
     </form>
+    <h1> Status's number means <br>
+        1= Waiting confirm <br>
+        2= Request accepted <br>
+        3= Request dinied <br>
+    </h1>
     <?php   
 }
 
@@ -95,7 +100,6 @@ if(array_key_exists('btn_delete_au',$_POST)){
 
     delete_auction();
     unset($_POST['aid']);
-    var_dump($_POST);
 
 }
 
@@ -106,9 +110,82 @@ if(array_key_exists('read_ap',$_POST)){
     read_auction_progress();
 }
 
+if(array_key_exists('start_ap',$_POST)){
+    ?>
+    <form method="post">
+        <label for="aid">AID</label>
+        <input name="aid" type="text" placeholder="Enter the AID to start"><br>
+        <button type="submit" name="btn_start_ap">Submit</button>
+    </form>
+    <?php   
+}
 
-//  var_dump($_POST);
-//  var_dump($_SESSION);
+if(array_key_exists('btn_start_ap',$_POST)){
+    start_auction_progress();
+}
+
+
+if(array_key_exists('close_ap',$_POST)){
+    ?>
+    <form method="post">
+        <label for="aid">AID</label>
+        <input name="aid" type="text" placeholder="Enter the AID to close"><br>
+        <button type="submit" name="btn_close_ap">Submit</button>
+    </form>
+    <?php   
+}
+
+if(array_key_exists('btn_close_ap',$_POST)){
+    close_auction_progress();
+}
+
+if(array_key_exists('update_ba',$_POST)){
+    ?>
+    <form method="post">
+        <label for="uid">UID</label>
+        <input name="uid" type="text" placeholder="Enter the UID to update"><br>
+        <label for="amount">Amount</label>
+        <input name="amount" type="text" placeholder="Enter the Amount to update"><br>
+        <button type="submit" name="btn_update_ba">Submit</button>
+    </form>
+    <?php   
+}
+
+if(array_key_exists('btn_update_ba',$_POST)){
+    update_user_balance();
+}
+
+if(array_key_exists('read_tr',$_POST)){
+    ?>
+    <form method="post">
+        <label for="etart_time">Start time</label>
+        <input name="start_time" type="datetime-local"><br>
+        <label for="end_time">End time</label>
+        <input name="end_time" type="datetime-local"><br>
+        <button type="submit" name="btn_read_tr">Submit</button>
+    </form>
+    <?php   
+}
+
+if(array_key_exists('btn_read_tr',$_POST)){
+    read_transaction();
+}
+
+if(array_key_exists('undo_tr',$_POST)){
+    ?>
+    <form method="post">
+        <label for="tid">TID</label>
+        <input name="tid" type="text">
+        <button type="submit" name="btn_undo_tr">Submit</button>
+    </form>
+    <?php   
+}
+
+if(array_key_exists('btn_undo_tr',$_POST)){
+    undo_transaction();
+}
+
+
 ?>
 
 <!DOCTYPE html>
@@ -130,9 +207,16 @@ if(array_key_exists('read_ap',$_POST)){
         <input name="delete_au" type="submit" value="Delete auction">
         <br>
         <input name="read_ap" type="submit" value="Read auctions in progress">
-        <!-- <input name="read_au" type="submit" value="Read exist auctions">
-        <input name="read_au" type="submit" value="Read exist auctions"> -->
+        <input name="start_ap" type="submit" value="Start auctions in list">
+        <input name="close_ap" type="submit" value="Close auctions in progress">
+        <br>
+        <input name="update_ba" type="submit" value="Update user balance">
+        <input name="read_tr" type="submit" value="Read transaction record">
+        <input name="undo_tr" type="submit" value="Undo transaction">
+        <br>
         <input name="logout" type="submit" value="Logout">
+    
+
    
     </form>
 

@@ -18,7 +18,7 @@ if(array_key_exists('read_au',$_POST)){
 }
 
 if(array_key_exists('create_au',$_POST)){
-    var_dump($_SESSION);
+
     ?>
     <form method="post">
         <label for="Product">Product</label>
@@ -37,8 +37,7 @@ if(array_key_exists('create_au',$_POST)){
 if(array_key_exists('btn_create_au',$_POST)){
     search_UID();
     create_auction();
-    var_dump($_POST);
-    var_dump($_SESSION);
+
 }
 
 
@@ -125,6 +124,7 @@ if(array_key_exists('display_bid',$_POST)){
 if(array_key_exists('display_win',$_POST)){
     search_UID();
     display_winlist();
+
 }
 
 
@@ -133,7 +133,7 @@ if(array_key_exists('display_win',$_POST)){
 
 
 
-//  var_dump($_SESSION);
+
 ?>
 
 <!DOCTYPE html>

@@ -396,7 +396,42 @@ function display_info(){
         
 }
 
+function update_user_balance(){
+    global $PDO;
+    $uid = $_POST['uid'];
+    $amount = $_POST['amount'];
 
+    $select = $PDO -> prepare("SELECT * FROM account WHERE UID = :uid");
+    $select -> execute(
+        [
+            ':uid' => $uid
+        ]
+    );
+    if($select -> rowCount() >0){
+        $amountNum = (int)$amount;
+        if($amountNum > 0){
+        $update = $PDO -> prepare("UPDATE account set Balance = :amount where UID = :uid;");
+        $update -> execute(
+            [
+                ':amount' => $amountNum,
+                ':uid' => $uid
+            ]
+        );
+    }
+        else {
+            $message = "Please enter only number that upper than 0";
+            echo $message;
+            sleep(3);
+            echo "<meta http-equiv='refresh' content='3;url=admin_page.php?'>";
+        }
+
+    } else {
+        $message = "Please enter only number that upper than 0";
+        echo $message;
+        sleep(3);
+        echo "<meta http-equiv='refresh' content='3;url=admin_page.php?'>";
+    }
+}
 
 
 ?>

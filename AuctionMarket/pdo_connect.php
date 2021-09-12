@@ -13,7 +13,7 @@
     $PDO->query("CREATE DATABASE IF NOT EXISTS $database");
     $PDO->query("use $database");
     
-    echo "DB connected";
+
   } catch(PDOException $Exception) {
     die('DB failed: '.$Exception->getMessage());
   }

@@ -8,7 +8,6 @@ $_SESSION['Loggedin'] = false;
 
 
 
-var_dump($PDO);
 
 ?>
 

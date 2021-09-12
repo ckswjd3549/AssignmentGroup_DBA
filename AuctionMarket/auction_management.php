@@ -68,7 +68,7 @@ function create_auction(){
         echo "<meta http-equiv='refresh' content='3;url=user_page.php?'>";
     }
 
-    var_dump($_SESSION);
+
 }
 
 function read_auction_user(){
@@ -104,6 +104,7 @@ function read_auction_user(){
             <th>Status</th>
             <th>Date_created</th>
             <th>Closing_time</th>
+            <th>Ongoing</th>
         </tr>
 
         <tr>
@@ -113,6 +114,7 @@ function read_auction_user(){
             <td><?php echo $row['Status']; ?></td>
             <td><?php echo $row['Date_created']; ?></td>
             <td><?php echo $row['Closing_time']; ?></td>
+            <td><?php echo $row['Ongoing']; ?></td>
 
         </tr>
 
@@ -158,6 +160,7 @@ function read_auction_admin(){
             <th>Date_created</th>
             <th>Closing_time</th>
             <th>Latest_bidder</th>
+            <th>Ongoing</th>
         </tr>
 
         <tr>
@@ -169,6 +172,7 @@ function read_auction_admin(){
             <td><?php echo $row['Date_created']; ?></td>
             <td><?php echo $row['Closing_time']; ?></td>
             <td><?php echo $row['Latest_bidder']; ?></td>
+            <td><?php echo $row['Ongoing']; ?></td>
 
         </tr>
 
@@ -224,7 +228,7 @@ function update_auction(){
             ]
             );
             unset($_SESSION['AID_exist']);
-            // var_dump($_SESSION);
+   
             echo "<meta http-equiv='refresh' content='3;url=admin_page.php?'>";
         }
         else{
@@ -358,115 +362,11 @@ function read_auction_progress(){
     </table>
 
     <?php endforeach;
-     var_dump($_POST);
-     var_dump($_SESSION);
+
     }
     else echo "No auction in progress exists";
 }
 
-
-function bid_auction_progress(){
-    global $PDO;
-    
-    $aid = $_POST['aid'];
-    $uid =  $_SESSION['UID']; 
-    $amount = $_POST['amount'];
-
-
-    $select = $PDO -> prepare("SELECT * FROM auction WHERE AID = :aid");
-    $select -> execute(
-        [
-            ':aid' => $aid
-        ]
-    );
-
-    if($select -> rowCount() >0){
-        foreach ($select as $row){
-            if($row['Ongoing'] == true){
-            $product = $row['Product'];
-            $minimum_amount = $row['Amount'];
-            }
-            else{ 
-                echo "Auction is not in progress";
-                sleep(3);
-                echo "<meta http-equiv='refresh' content='3;url=user_page.php?'>";
-            }
-        }
-    }
-    
-    $select2 = $PDO -> prepare("SELECT Balance FROM account WHERE UID = :uid");
-    $select2 -> execute(
-        [
-            ':uid' => $uid
-        ]
-    );
-
-    // $Uamount = $select2
-    print_r($select2);
-
-    // var_dump($amountU);
-
-    if(!$product == null){
-        $amountNum = (float)$amount;
-        $minimumNum = (float)$minimum_amount;
-        if(!($amountNum <= $minimumNum)){
-            $_SESSION['amount_check'] = true;
-        }
-        else{
-            $message = "Please enter only number that upper than Auction amount";
-            echo $message;
-            sleep(3);
-            echo "<meta http-equiv='refresh' content='3;url=user_page.php?'>";
-        }
-    }
-    else {
-        echo "AID doesn't exitst";
-        sleep(3);
-        echo "<meta http-equiv='refresh' content='3;url=user_page.php?'>";
-    }
-
-    if($_SESSION['amount_check'] == true){
-        $add_bid = $PDO -> prepare(
-            "INSERT INTO bidlist(`UID`, `Product`, `Amount`,`AID`) 
-            VALUES(:uid, :product, :amount, :aid)");
-        $add_bid -> execute(
-            [
-            ':uid' => $uid, 
-            ':product' => $product, 
-            ':amount' => $amount,
-            ':aid' => $aid
-            ]
-            );
-        $update_auction1 = $PDO -> prepare("UPDATE auction set Amount = :amount where AID = :aid;");
-        $update_auction1 -> execute(
-            [
-                ':amount' => $amountNum, 
-                ':aid' => $aid  
-            ]
-            );
-        $update_auction2 = $PDO -> prepare("UPDATE auction set Latest_bidder = :uid where AID = :aid;");
-        $update_auction2 -> execute(
-                [
-                    ':uid' => $uid, 
-                    ':aid' => $aid  
-                ]
-                );
-        $update_auction3 = $PDO -> prepare("UPDATE auction set Bid_count = Bid_count + 1 where AID = :aid;");
-        $update_auction3 -> execute(
-                [
-                    ':aid' => $aid  
-                ]
-                );
-        $_SESSION['amount_check'] = false;
-        echo "Successfully bidded";
-        sleep(3);
-        echo "<meta http-equiv='refresh' content='3;url=user_page.php?'>";
-            
-
-
-        
-    }
-}
 
 function display_bidlist(){
     global $PDO;
@@ -517,7 +417,7 @@ function display_bidlist(){
 function display_winlist(){
     global $PDO;
     $uid =  $_SESSION['UID']; 
-    $select = $PDO -> prepare("SELECT * FROM auction WHERE Ongoing = false And UID =:uid");
+    $select = $PDO -> prepare("SELECT * FROM auction WHERE Ongoing = false And Latest_bidder =:uid");
     $select -> execute(
         [
             ':uid' => $uid
@@ -558,8 +458,301 @@ function display_winlist(){
         else echo "You've never won a bid";
     }
 
+### bid progress
+function bid_auction_progress(){
+    global $PDO;
+    
+    $aid = $_POST['aid'];
+    $uid =  $_SESSION['UID']; 
+    $amount = $_POST['amount'];
+
+
+    $select = $PDO -> prepare("SELECT * FROM auction WHERE AID = :aid");
+    $select -> execute(
+        [
+            ':aid' => $aid
+        ]
+    );
+
+    if($select -> rowCount() >0){
+        foreach ($select as $row){
+            if($row['Ongoing'] == true){
+            $product = $row['Product'];
+            $minimum_amount = $row['Amount'];
+            }
+            else{ 
+                echo "Auction is not in progress";
+                sleep(3);
+                echo "<meta http-equiv='refresh' content='3;url=admin_page.php?'>";
+            }
+        }
+    }
+    
+    $select2 = $PDO -> prepare("SELECT Balance FROM account WHERE UID = :uid");
+    $select2 -> execute(
+        [
+            ':uid' => $uid
+        ]
+    );
 
 
 
+    if(!$product == null){
+        $amountNum = (float)$amount;
+        $minimumNum = (float)$minimum_amount;
+        if(!($amountNum <= $minimumNum)){
+            $_SESSION['amount_check'] = true;
+        }
+        else{
+            $message = "Please enter only number that upper than Auction amount";
+            echo $message;
+            sleep(3);
+            echo "<meta http-equiv='refresh' content='3;url=admin_page.php?'>";
+        }
+    }
+    else {
+        echo "AID doesn't exitst";
+        sleep(3);
+        echo "<meta http-equiv='refresh' content='3;url=admin_page.php?'>";
+    }
+
+    if($_SESSION['amount_check'] == true){
+        $add_bid = $PDO -> prepare(
+            "INSERT INTO bidlist(`UID`, `Product`, `Amount`,`AID`) 
+            VALUES(:uid, :product, :amount, :aid)");
+        $add_bid -> execute(
+            [
+            ':uid' => $uid, 
+            ':product' => $product, 
+            ':amount' => $amount,
+            ':aid' => $aid
+            ]
+            );
+        $update_auction1 = $PDO -> prepare("UPDATE auction set Amount = :amount where AID = :aid;");
+        $update_auction1 -> execute(
+            [
+                ':amount' => $amountNum, 
+                ':aid' => $aid  
+            ]
+            );
+        $update_auction2 = $PDO -> prepare("UPDATE auction set Latest_bidder = :uid where AID = :aid;");
+        $update_auction2 -> execute(
+                [
+                    ':uid' => $uid, 
+                    ':aid' => $aid  
+                ]
+                );
+        $update_auction3 = $PDO -> prepare("UPDATE auction set Bid_count = Bid_count + 1 where AID = :aid;");
+        $update_auction3 -> execute(
+                [
+                    ':aid' => $aid  
+                ]
+                );
+        $_SESSION['amount_check'] = false;
+        echo "Successfully bidded";
+        sleep(3);
+        echo "<meta http-equiv='refresh' content='3;url=admin_page.php?'>";
+            
+
+
+        
+    }
+}
+
+function start_auction_progress(){
+    global $PDO;
+
+    $aid = $_POST['aid'];
+    $select = $PDO->prepare("SELECT * FROM auction where Ongoing = FALSE And AID = :aid;");
+    $select ->execute(
+        [
+            ':aid' => $aid
+        ]
+    );
+    if($select -> rowCount() >0){
+        $update = $PDO->prepare("UPDATE auction set Ongoing = TRUE WHERE AID = :aid;");
+        $update ->execute(
+            [
+                ':aid' => $aid
+            ]
+            );
+            echo "updated";
+            unset($_POST['aid']);
+        }
+        
+    else {
+        echo "Auction doesn't exists or is already ongoing";
+        unset($_POST['aid']);
+    }
+}
+
+
+function close_auction_progress(){
+    global $PDO;
+
+    $aid = $_POST['aid'];
+    $select = $PDO->prepare("SELECT * FROM auction where Ongoing = TRUE And AID = :aid;");
+    $select ->execute(
+        [
+            ':aid' => $aid
+        ]
+    );
+    if($select -> rowCount() >0){
+        foreach ($select as $row){
+            $winnerID = $row['Latest_bidder'];
+            $auctionBalacne = $row['Amount'];
+            $auctioneerID = $row['UID'];
+        }
+    
+    ###
+    $PDO->beginTransaction();
+    try {
+           
+        
+        $PDO -> exec('LOCK TABLES  account WRITE, auction WRITE, transaction WRITE;');
+        $winBalance = $PDO -> prepare("SELECT Balance from account WHERE UID = :winID;");
+        $winBalance -> execute(
+            [
+                ':winID' => $winnerID
+            ]
+            );
+        $deposit = $PDO ->prepare("UPDATE account SET Balance = Balance + :au_bal WHERE UID = :auctionID;");
+        $deposit -> execute(
+            [
+            ':au_bal' => $auctionBalacne,
+            ':auctionID' => $auctioneerID
+            ]
+            );
+
+        
+        $withdraw = $PDO ->prepare("UPDATE account SET Balance = Balance - :au_bal WHERE UID = :winID;");
+        $withdraw -> execute(
+            [
+                ':au_bal' => $auctionBalacne,
+                ':winID' => $winnerID
+            ]
+            );
+        $update = $PDO->prepare("UPDATE auction set Ongoing = FALSE WHERE AID = :aid;");
+        $update ->execute(
+            [
+                ':aid' => $aid
+            ]
+            );
+
+        $insert = $PDO-> prepare("INSERT INTO transaction(`Deposit_UID`, `Recipent_UID`, `Amount`)
+        VALUES(:winId, :AuID, :amount)");
+        $insert ->execute(
+            [
+                ':winId' => $winnerID,
+                ':AuID' => $auctioneerID,
+                ':amount' => $auctionBalacne
+            ]
+            );
+        echo "updated"; 
+        unset($_POST['aid']);
+        $PDO ->exec("UNLOCK TABLES;"); 
+        $PDO ->commit();  
+    } catch(Exception  $e) { 
+            $PDO->rollBack();
+            echo "Failed: " . $e->getMessage();
+        } 
+    }
+    else {
+        echo "Auction doesn't exists or is not ongoing";
+        unset($_POST['aid']);
+    }
+}
+
+
+function read_transaction(){
+    global $PDO;
+    $start_time = $_POST['start_time'];
+    $end_time = $_POST['end_time'];
+    $select = $PDO->prepare("SELECT * FROM transaction where date_created > :start_time && date_created < :end_time;");
+    $select ->execute(
+        [
+            ':start_time' => $start_time,
+            ':end_time' => $end_time
+        ]
+    );
+    if($select -> rowCount() >0){
+        echo `<table class=’table table-hover’><tr>`;
+        foreach($select as $row) : ?>
+    
+        <style>
+        table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+        }
+        </style>
+    
+        <table>
+            <tr>
+                <th>TID</th>
+                <th>Deposit_UID</th>
+                <th>Recipent_UID</th>
+                <th>Amount</th>
+                <th>date_created</th>
+            </tr>
+    
+            <tr>
+                <td><?php echo $row['TID']; ?></td>
+                <td><?php echo $row['Deposit_UID']; ?></td>
+                <td><?php echo $row['Recipent_UID']; ?></td>
+                <td><?php echo $row['Amount']; ?></td>
+                <td><?php echo $row['date_created']; ?></td>
+    
+            </tr>
+    
+        </table>
+    
+        <?php endforeach;
+    } else{
+        echo "No result exists between the two time zones";
+        sleep(3);
+        echo "<meta http-equiv='refresh' content='3;url=admin_page.php?'>";
+    }
+}  
+
+function undo_transaction(){
+    global $PDO;
+    $tid = $_POST['tid'];
+    $select = $PDO->prepare("SELECT * FROM transaction where TID = :tid;");
+    $select ->execute(
+        [
+            ':tid' => $tid
+        ]
+        );
+    if($select -> rowCount() >0){
+        foreach($select as $row){
+            $Deposit_UID = $row['Deposit_UID'];
+            $Recipent_UID = $row['Recipent_UID'];
+            $amount = $row['Amount'];
+        }
+    $deposit = $PDO ->prepare("UPDATE account SET Balance = Balance + :au_bal WHERE UID = :depositID;");
+    $deposit -> execute(
+            [
+            ':au_bal' => $amount,
+            ':depositID' => $Deposit_UID
+            ]
+            );
+
+        
+    $withdraw = $PDO ->prepare("UPDATE account SET Balance = Balance - :au_bal WHERE UID = :recipentID;");
+    $withdraw -> execute(
+            [
+                ':au_bal' => $amount,
+                ':recipentID' => $Recipent_UID
+            ]
+            );
+    
+    } else{
+        echo "Transaction doesn't exist";
+        sleep(3);
+        echo "<meta http-equiv='refresh' content='3;url=admin_page.php?'>";
+    }
+}
+
+    
 
 ?>

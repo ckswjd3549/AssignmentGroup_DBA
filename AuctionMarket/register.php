@@ -8,18 +8,12 @@ $_SESSION['register_request'] = false;
 
 
 
-// echo 'register';
-var_dump($_POST);
-
 if(Info_check() == true){
     ID_register();
 
 
+
 }
-
-
-
-var_dump($_SESSION);
 
 
 
