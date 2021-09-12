@@ -32,60 +32,51 @@ CREATE TABLE IF NOT EXISTS account(
 
 -- Dumping data is automatically executed in register.php page.
 
--- Table structure for table bidding
-
+-- Table structure for table auction
 CREATE TABLE IF NOT EXISTS auction(
     AID INT NOT NULL,
     UID VARCHAR(30) NOT NULL,
     Product VARCHAR(30) NOT NULL,
-    Amount float NOT NULL,
+    Amount INT NOT NULL,
     Status tinyint NOT NULL DEFAULT 1 ,
     Closing_time datetime NOT NULL,
     Date_created datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
     Ongoing boolean default false,
 	Bid_count INT NOT NULL default 0,
     Latest_bidder INT not null default 0,
-    UNIQUE(AID, UID, Product)
+    UNIQUE(AID, UID, Product, Amount)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-ALTER TABLE auction
-    ADD PRIMARY KEY (AID);
-ALTER TABLE auction
-    MODIFY AID INT NOT NULL AUTO_INCREMENT;
+-- Dumping data for table auction
+Insert into auction(`UID`, `Product`, `Amount`,`Closing_time`) VALUES('3','c','1','2021-09-10-20:00');
 
-
+-- Table structure for table bidlist
 CREATE TABLE IF NOT EXISTS bidlist(
 	AID INT NOT NULL,
 	BID INT NOT NULL,
 	UID INT NOT NULL,	
     Product VARCHAR(30) NOT NULL,
-    Amount float NOT NULL,
+    Amount INT NOT NULL,
     date_created datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
     UNIQUE(BID, UID, Product, Amount)
     )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-ALTER TABLE bidlist
-    ADD PRIMARY KEY (BID, amount);
-ALTER TABLE bidlist
-    MODIFY BID INT NOT NULL AUTO_INCREMENT;
+-- Dumping data for table bidlist
+Insert into bidlist(`UID`, `Product`, `Amount`,`AID`) VALUES('3','c','3.5','4');
 
-
-
+-- Table structure for table auction
 CREATE TABLE IF NOT EXISTS Transaction(
 	TID INT NOT NULL,
 	Deposit_UID INT NOT NULL,
 	Recipent_UID INT NOT NULL,
-	Amount float NOT NULL,
+	Amount INT NOT NULL,
     date_created datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
     UNIQUE(TID, Deposit_UID,Amount)
     )ENGINE=InnoDB DEFAULT CHARSET=utf8;
-    
-ALTER TABLE Transaction
-    ADD PRIMARY KEY (TID, amount);
-ALTER TABLE Transaction
-    MODIFY TID INT NOT NULL AUTO_INCREMENT;
 
-
+-- Dumping data for table transaction
+INSERT INTO transaction(`Deposit_UID`, `Recipent_UID`, `Amount`)
+values('1','2','3');
 -- Table structure for table category
 CREATE TABLE IF NOT EXISTS category(
                                        id INT NOT NULL,
@@ -126,9 +117,17 @@ INSERT INTO product VALUES(1, 5, 'Sample Smart Phone',  7000, 7000, '2020-10-27 
 # DROP TABLE IF EXISTS category;
 # DROP TABLE IF EXISTS product;
 
--- Indexes for table bidding
-ALTER TABLE bidding
-    ADD PRIMARY KEY (id, amount);
+-- Indexes for table auction
+ALTER TABLE auction
+    ADD PRIMARY KEY (AID, Amount);
+
+-- Indexes for table bidlist
+ALTER TABLE bidlist
+    ADD PRIMARY KEY (BID, amount);
+
+-- Indexes for table Transaction
+ALTER TABLE Transaction
+    ADD PRIMARY KEY (TID, amount);
 
 -- Indexes for table category
 ALTER TABLE category
@@ -146,9 +145,17 @@ ALTER TABLE branch
 ALTER TABLE account
     ADD PRIMARY KEY (id);
 
--- AUTO_INCREMENT for table bidding
-ALTER TABLE bidding
-    MODIFY id INT NOT NULL AUTO_INCREMENT;
+-- AUTO_INCREMENT for table auction
+ALTER TABLE auction
+    MODIFY AID INT NOT NULL AUTO_INCREMENT;
+
+-- AUTO_INCREMENT for table bidlist
+ALTER TABLE bidlist
+    MODIFY BID INT NOT NULL AUTO_INCREMENT;
+
+-- AUTO_INCREMENT for table Transaction
+ALTER TABLE Transaction
+    MODIFY TID INT NOT NULL AUTO_INCREMENT;
 
 -- AUTO_INCREMENT for table category
 ALTER TABLE category
@@ -171,7 +178,7 @@ ALTER TABLE category
 
 SELECT * from category where name = 'Appliances';
 
-ALTER TABLE bidding
+ALTER TABLE auction
     PARTITION BY RANGE (amount)(
     PARTITION p0 VALUES LESS THAN (100),
     PARTITION p1 VALUES LESS THAN (200),
@@ -183,14 +190,14 @@ ALTER TABLE bidding
     PARTITION p7 VALUES LESS THAN (maxvalue)
     );
 
-SELECT * FROM bidding where amount = 300;
+SELECT * FROM auction where amount = 300;
 
 DELIMITER $$
 
 create procedure sp_bidding_price(in b_id INT, in new_amount INT)
 begin
-update bidding set amount = new_amount
-where id = b_id;
+update auction set amount = new_amount
+where UID = b_id;
 end $$
 
 DELIMITER ;
@@ -200,7 +207,7 @@ call sp_bidding_price('1', 100);
 delimiter $$
 
 create trigger tgr_prevent_bidding_amount
-    before update on bidding
+    before update on auction
     for each row
 begin
     if old.amount >= new.amount then
