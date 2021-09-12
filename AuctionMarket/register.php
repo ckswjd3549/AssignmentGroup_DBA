@@ -10,14 +10,9 @@ $_SESSION['register_request'] = false;
 
 if(Info_check() == true){
     ID_register();
-
-
-
 }
 
-
-
-
+// Used when user clicks register button
 
 if(($_SESSION['register_request']) == true){
     add_account();

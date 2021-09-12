@@ -7,6 +7,9 @@ include_once("pdo_connect.php");
 
 $_SESSION['UID'] = "";
 
+
+## Define UID based on the id and password that used in login session
+
 function search_UID(){
     global $PDO;
     $id = ($_SESSION['id']);
@@ -29,6 +32,10 @@ function search_UID(){
 }
 
 
+## CRUD of Auction Request
+
+
+## Create new request
 function create_auction(){
 
     global $PDO;
@@ -51,6 +58,7 @@ function create_auction(){
         sleep(3);
         echo "<meta http-equiv='refresh' content='3;url=user_page.php?'>";
     
+    // Insert into aucction table if all information is correct
     if($_SESSION['amount_check'] == true){
     $insert = $PDO -> prepare("INSERT INTO auction(`UID`, `Product`, `Amount`,`Closing_time`)
     VALUES(:uid, :product , :amount, :closing_time)");
@@ -71,6 +79,9 @@ function create_auction(){
 
 }
 
+
+## Read all requests of user sent to admin
+
 function read_auction_user(){
 
    
@@ -83,9 +94,10 @@ function read_auction_user(){
             ':uid' => $uid
         ]
         );
-    
+
     if($select -> rowCount() >0){
     echo `<table class=’table table-hover’><tr>`;
+     // Display table to user as a table form
     ?> <h1> Your auction requests</h1> <?php
     foreach($select as $row) : ?>
 
@@ -131,6 +143,8 @@ function read_auction_user(){
     else echo "No request exists";
 }
 
+
+## Read all requests with information that admin needed 
 function read_auction_admin(){
 
    
@@ -140,6 +154,7 @@ function read_auction_admin(){
     $select ->execute();
     
     if($select -> rowCount() >0){
+     // Display table to user as a table form
     echo `<table class=’table table-hover’><tr>`;
     foreach($select as $row) : ?>
 
@@ -192,7 +207,7 @@ function read_auction_admin(){
 
 
 
-
+#Update status of request
 function update_auction(){
     global $PDO;
     $aid = ($_POST['aid']);
@@ -203,7 +218,7 @@ function update_auction(){
     $select = $PDO->prepare("SELECT * FROM auction");
     $select ->execute();
     
-    
+    // Check request is exists
      $message = "AID doesn't exist";
     foreach ($select as $row){
         if($aid == $row["AID"] ){
@@ -216,7 +231,7 @@ function update_auction(){
         }
 
  
-        
+      // Update requests table   
     if($_SESSION['AID_exist']== true){
         $statNum = (int)$status;
         if($statNum > 0 && $statNum <= 3){
@@ -251,6 +266,8 @@ function update_auction(){
   
     
 }
+
+## Delete request from the table
 function delete_auction(){
 
 
@@ -265,6 +282,8 @@ function delete_auction(){
 
 ## CRUD of Auction in progress
 
+
+## Read all auction that currently ongoing
 function read_auction_progress(){
 
    
@@ -289,7 +308,7 @@ function read_auction_progress(){
         $sort = 'count_desc';
     }
  
-
+    // Sorts data by amount, time, bid count
     switch ($sort){
         case 'amount_asc':
             $select = $PDO->prepare("SELECT * FROM auction where Ongoing = true ORDER BY Amount ASC");
@@ -326,6 +345,7 @@ function read_auction_progress(){
     echo `<table class=’table table-hover’><tr>`;
     ?> <h1> Current available auction</h1>
     <?php
+    // Display table to user as a table form
     foreach($select as $row) : ?>
 
     <style>
@@ -368,6 +388,9 @@ function read_auction_progress(){
 }
 
 
+
+## Display list of bids 
+
 function display_bidlist(){
     global $PDO;
     $uid =  $_SESSION['UID']; 
@@ -378,6 +401,7 @@ function display_bidlist(){
             ':uid' => $uid
         ]
     );
+    // Display table to user as a table form
     if($select -> rowCount() >0){
         foreach($select as $row) : ?>
 
@@ -414,6 +438,7 @@ function display_bidlist(){
     else echo "You've never bid";
 }
 
+## Display list of wins 
 function display_winlist(){
     global $PDO;
     $uid =  $_SESSION['UID']; 
@@ -423,6 +448,7 @@ function display_winlist(){
             ':uid' => $uid
         ]
     );
+      // Display table to user as a table form
     if($select -> rowCount() >0){
         foreach($select as $row) : ?>
         <style>
@@ -458,7 +484,9 @@ function display_winlist(){
         else echo "You've never won a bid";
     }
 
-### bid progress
+## bid progress
+
+## Bidding to auction that is currently ongoing
 function bid_auction_progress(){
     global $PDO;
     
@@ -473,7 +501,7 @@ function bid_auction_progress(){
             ':aid' => $aid
         ]
     );
-
+    // Check auction is ongoing
     if($select -> rowCount() >0){
         foreach ($select as $row){
             if($row['Ongoing'] == true){
@@ -496,7 +524,7 @@ function bid_auction_progress(){
     );
 
 
-
+    // Check that amount is upper than current minimum amount of auction
     if(!$product == null){
         $amountNum = (float)$amount;
         $minimumNum = (float)$minimum_amount;
@@ -516,6 +544,7 @@ function bid_auction_progress(){
         echo "<meta http-equiv='refresh' content='3;url=admin_page.php?'>";
     }
 
+    // If all information is correct
     if($_SESSION['amount_check'] == true){
         $add_bid = $PDO -> prepare(
             "INSERT INTO bidlist(`UID`, `Product`, `Amount`,`AID`) 
@@ -528,6 +557,7 @@ function bid_auction_progress(){
             ':aid' => $aid
             ]
             );
+        // Renew minimum amount of auction
         $update_auction1 = $PDO -> prepare("UPDATE auction set Amount = :amount where AID = :aid;");
         $update_auction1 -> execute(
             [
@@ -535,6 +565,7 @@ function bid_auction_progress(){
                 ':aid' => $aid  
             ]
             );
+        // Update latest bidder 
         $update_auction2 = $PDO -> prepare("UPDATE auction set Latest_bidder = :uid where AID = :aid;");
         $update_auction2 -> execute(
                 [
@@ -542,6 +573,7 @@ function bid_auction_progress(){
                     ':aid' => $aid  
                 ]
                 );
+        // Add +1 to bid count
         $update_auction3 = $PDO -> prepare("UPDATE auction set Bid_count = Bid_count + 1 where AID = :aid;");
         $update_auction3 -> execute(
                 [
@@ -559,6 +591,8 @@ function bid_auction_progress(){
     }
 }
 
+
+## Change auction to Ongoing 
 function start_auction_progress(){
     global $PDO;
 
@@ -586,7 +620,7 @@ function start_auction_progress(){
     }
 }
 
-
+## Change Ongoing auction to stop and transact money
 function close_auction_progress(){
     global $PDO;
 
@@ -604,11 +638,11 @@ function close_auction_progress(){
             $auctioneerID = $row['UID'];
         }
     
-    ###
+   //  Using Transaction to prevent critical issues when  error is occured 
     $PDO->beginTransaction();
     try {
            
-        
+        // Get UID of Winner 
         $PDO -> exec('LOCK TABLES  account WRITE, auction WRITE, transaction WRITE;');
         $winBalance = $PDO -> prepare("SELECT Balance from account WHERE UID = :winID;");
         $winBalance -> execute(
@@ -616,6 +650,7 @@ function close_auction_progress(){
                 ':winID' => $winnerID
             ]
             );
+        // Add money to auctioneer
         $deposit = $PDO ->prepare("UPDATE account SET Balance = Balance + :au_bal WHERE UID = :auctionID;");
         $deposit -> execute(
             [
@@ -624,7 +659,7 @@ function close_auction_progress(){
             ]
             );
 
-        
+        // Deduct money from Winner 
         $withdraw = $PDO ->prepare("UPDATE account SET Balance = Balance - :au_bal WHERE UID = :winID;");
         $withdraw -> execute(
             [
@@ -632,13 +667,14 @@ function close_auction_progress(){
                 ':winID' => $winnerID
             ]
             );
+        // Change Ongoing auction to stop
         $update = $PDO->prepare("UPDATE auction set Ongoing = FALSE WHERE AID = :aid;");
         $update ->execute(
             [
                 ':aid' => $aid
             ]
             );
-
+        //  Save information to transaction table
         $insert = $PDO-> prepare("INSERT INTO transaction(`Deposit_UID`, `Recipent_UID`, `Amount`)
         VALUES(:winId, :AuID, :amount)");
         $insert ->execute(
@@ -653,6 +689,7 @@ function close_auction_progress(){
         $PDO ->exec("UNLOCK TABLES;"); 
         $PDO ->commit();  
     } catch(Exception  $e) { 
+        // If it has an error while process, rollback everything
             $PDO->rollBack();
             echo "Failed: " . $e->getMessage();
         } 
@@ -663,7 +700,7 @@ function close_auction_progress(){
     }
 }
 
-
+## Read list of transaction
 function read_transaction(){
     global $PDO;
     $start_time = $_POST['start_time'];
@@ -676,6 +713,7 @@ function read_transaction(){
         ]
     );
     if($select -> rowCount() >0){
+         // Display table to user as a table form
         echo `<table class=’table table-hover’><tr>`;
         foreach($select as $row) : ?>
     
@@ -714,6 +752,7 @@ function read_transaction(){
     }
 }  
 
+## Undo transaction
 function undo_transaction(){
     global $PDO;
     $tid = $_POST['tid'];
@@ -723,12 +762,14 @@ function undo_transaction(){
             ':tid' => $tid
         ]
         );
+        // Get Winner's ID, Auctioneer's ID and Amount
     if($select -> rowCount() >0){
         foreach($select as $row){
             $Deposit_UID = $row['Deposit_UID'];
             $Recipent_UID = $row['Recipent_UID'];
             $amount = $row['Amount'];
         }
+        // Add money to Winner
     $deposit = $PDO ->prepare("UPDATE account SET Balance = Balance + :au_bal WHERE UID = :depositID;");
     $deposit -> execute(
             [
@@ -737,7 +778,7 @@ function undo_transaction(){
             ]
             );
 
-        
+        // Deduct money from auctionner
     $withdraw = $PDO ->prepare("UPDATE account SET Balance = Balance - :au_bal WHERE UID = :recipentID;");
     $withdraw -> execute(
             [

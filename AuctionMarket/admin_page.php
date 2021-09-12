@@ -9,11 +9,12 @@ if($_SESSION['Loggedin'] != true){
 
 
 
-## CRUD of Accuont
+// CRUD of Accuont
 
 if(array_key_exists('read_ac',$_POST)){
      read_account();
 }
+
 if(array_key_exists('update_ac',$_POST)){
     ?>
     <form method="post">
@@ -27,6 +28,29 @@ if(array_key_exists('update_ac',$_POST)){
     </form>
     <?php   
 }
+
+if(array_key_exists('btn_update_ac',$_POST)){
+
+    update_account();
+}
+
+if(array_key_exists('update_ba',$_POST)){
+    ?>
+    <form method="post">
+        <label for="uid">UID</label>
+        <input name="uid" type="text" placeholder="Enter the UID to update"><br>
+        <label for="amount">Amount</label>
+        <input name="amount" type="text" placeholder="Enter the Amount to update"><br>
+        <button type="submit" name="btn_update_ba">Submit</button>
+    </form>
+    <?php   
+}
+
+if(array_key_exists('btn_update_ba',$_POST)){
+    update_user_balance();
+}
+
+
 if(array_key_exists('delete_ac',$_POST)){
     ?>
     <form method="post">
@@ -37,27 +61,17 @@ if(array_key_exists('delete_ac',$_POST)){
     <?php
 }
 
-if(array_key_exists('logout',$_POST)){
-    $_SESSION['Loggedin'] = false;
-    header('location: index.php');
-}
-
 if(array_key_exists('btn_delete_ac',$_POST)){
 
     delete_account();
     unset($_POST['uid']);
-
-
-}
-
-if(array_key_exists('btn_update_ac',$_POST)){
-
-    update_account();
 }
 
 
 
-## CRUD of auction
+
+
+// CRUD of auction
 
 if(array_key_exists('read_au',$_POST)){
     search_UID();
@@ -104,7 +118,7 @@ if(array_key_exists('btn_delete_au',$_POST)){
 }
 
 
-## CRUD of Auction in progress
+// CRUD of Auction in progress
 
 if(array_key_exists('read_ap',$_POST)){
     read_auction_progress();
@@ -139,21 +153,9 @@ if(array_key_exists('btn_close_ap',$_POST)){
     close_auction_progress();
 }
 
-if(array_key_exists('update_ba',$_POST)){
-    ?>
-    <form method="post">
-        <label for="uid">UID</label>
-        <input name="uid" type="text" placeholder="Enter the UID to update"><br>
-        <label for="amount">Amount</label>
-        <input name="amount" type="text" placeholder="Enter the Amount to update"><br>
-        <button type="submit" name="btn_update_ba">Submit</button>
-    </form>
-    <?php   
-}
 
-if(array_key_exists('btn_update_ba',$_POST)){
-    update_user_balance();
-}
+// CRUD of Transaction
+
 
 if(array_key_exists('read_tr',$_POST)){
     ?>
@@ -185,6 +187,13 @@ if(array_key_exists('btn_undo_tr',$_POST)){
     undo_transaction();
 }
 
+// Logout
+
+
+if(array_key_exists('logout',$_POST)){
+    $_SESSION['Loggedin'] = false;
+    header('location: index.php');
+}
 
 ?>
 

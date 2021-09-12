@@ -9,7 +9,7 @@ if($_SESSION['Loggedin'] != true){
 
 
 
-
+// Auction requests
 
 
 if(array_key_exists('read_au',$_POST)){
@@ -32,8 +32,6 @@ if(array_key_exists('create_au',$_POST)){
     <?php   
 }
 
-
-
 if(array_key_exists('btn_create_au',$_POST)){
     search_UID();
     create_auction();
@@ -41,7 +39,7 @@ if(array_key_exists('btn_create_au',$_POST)){
 }
 
 
-## CRUD of Auction in progress
+// Auction in progress
 
 if(array_key_exists('read_ap',$_POST)){
     ?>
@@ -105,11 +103,9 @@ if(array_key_exists('btn_bid_ap',$_POST)){
     
 
 
-if(array_key_exists('logout',$_POST)){
-    $_SESSION['Loggedin'] = false;
-    header('location: index.php');
-}
 
+
+// Display information
 
 if(array_key_exists('display_info',$_POST)){
     search_UID();
@@ -127,7 +123,12 @@ if(array_key_exists('display_win',$_POST)){
 
 }
 
+// Logout
 
+if(array_key_exists('logout',$_POST)){
+    $_SESSION['Loggedin'] = false;
+    header('location: index.php');
+}
 
 
 

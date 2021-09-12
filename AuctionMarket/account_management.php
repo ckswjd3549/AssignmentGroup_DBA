@@ -8,19 +8,238 @@ include_once("pdo_connect.php");
 
 
 
+## Search ID and Password from account table
 
-
-
-
-function delete_account(){
-
-
+function ID_search(){
     global $PDO;
-    extract($_POST);
-    $delete = $PDO->query("DELETE FROM account where UID = " . $uid);
-  
+    $id = ($_POST['id']);
+    $password = ($_POST['password']);
+    $result = $PDO->query("SELECT* FROM account");
+   
+    
+    $message = "Id doesn't exist or wrong password";
+    foreach ($result as $row){
+        // Search account with email 
+        if($id === $row["Email"] && $password === $row["Password"]){
+            // If account is exists and it is admin
+            if($row["Admin"] == true){
+                $_SESSION['Loggedin'] = true;
+                $_SESSION['id'] = $id;
+                $_SESSION['password'] = $password;
+                header('location: admin_page.php');
+                break;
+
+            }
+            // If account is exists and it is user
+            $_SESSION['Loggedin'] = true;
+            $_SESSION['id'] = $id;
+            $_SESSION['password'] = $password;
+            header('location: user_page.php');
+
+            break;
+            
+        }
+        // Search account with phone 
+        else if($id === $row["Phone"] && $password === $row["Password"]){
+             // If account is exists and it is admin
+                if($row["Admin"] == true){
+                    $_SESSION['Loggedin'] = true;
+                    $_SESSION['id'] = $id;
+                    $_SESSION['password'] = $password;
+                    header('location: admin_page.php');
+                    break;
+                }
+                // If account is exists and it is user
+                $_SESSION['Loggedin'] = true;
+                $_SESSION['id'] = $id;
+                $_SESSION['password'] = $password;
+                header('location: user_page.php');
+                break;
+        }
+    }   
+    // When account doesn't exists 
+    echo $message;
+    echo "<meta http-equiv='refresh' content='3;url=index.php?'>";
+}
+
+## Check information is fully filled when register account
+
+
+function Info_check(){
+    $message ="Please filled all information";
+    if(empty ($_POST['email'])){
+            echo $message;
+        }
+
+        else if (empty ($_POST['phone'])){
+            echo $message;
+        }
+
+        else if (empty ($_POST['password'])){
+            echo $message;
+        }
+
+        else if (empty ($_POST['password_check'])){
+            echo $message;
+        }
+
+        else if (empty ($_POST['fname'])){
+            echo $message;
+        }
+
+        else if (empty ($_POST['lname'])){
+            echo $message;
+        }
+
+        else if (empty ($_POST['IDnum'])){
+            echo $message;
+        }
+
+
+        else if (empty ($_POST['address'])){
+            echo $message;
+        }
+
+        else if (empty ($_POST['city'])){
+            echo $message;
+        }
+
+        else if (empty ($_POST['country'])){
+            echo $message;
+        }
+        else return true;
+
+    }
+
+
+
+## Create new account
+
+function ID_register(){
+    $message ="";
+    $email = ($_POST['email']);
+    $phone = ($_POST['phone']);
+    $passwordR = ($_POST['password']);
+    $password_check = ($_POST['password_check']);
+    $fname = ($_POST['fname']);
+    $lname = ($_POST['lname']);
+    // Check email is valid form
+if (filter_var($email, FILTER_VALIDATE_EMAIL) != true) {
+    $message = "Invalid Email";
+    }   
+    // Check phone number is numeric
+    else if(is_numeric($phone) != true){
+        $message = "Please enter only phone number(without - and whitespace)";
+    }
+    // Check Password is matched with Password check
+    else if($passwordR != $password_check){
+        $message = "Password and password confirmation do not match";
+    }
+    // Check name is string
+    else if((!is_string($fname) && ($lname))){
+        $message = "Please enter only Alphabet on name fileds";
+    }
+    else  {
+        $message = "success";
+        $_SESSION['register_request'] = true;
+    }
+
+    echo $message;
 
 }
+
+## CRUD of account
+
+## Add row to account table
+function add_account(){
+    
+    global $PDO;
+    $email = ($_POST['email']);
+    $phone = ($_POST['phone']);
+    $passwordR = ($_POST['password']);
+    $fname = ($_POST['fname']);
+    $lname = ($_POST['lname']);
+    $idnum = ($_POST['IDnum']);
+    $address = ($_POST['address']);
+    $city = ($_POST['city']);
+    $country = ($_POST['country']);
+    $balacne = 0;
+
+    $sth = $PDO->prepare("INSERT INTO account(`email`, `phone`, `password`, `first_name`, `last_name`, `id_num`, `address`, `city`, `country`, `balance`)
+         VALUES(:email, :phone , :password, :first_name, :last_name, :id_num, :address, :city, :country, :balance)");
+    $sth->execute(
+        [':email' => $email, 
+        ':phone' => $phone, 
+        ':password' => $passwordR,
+        ':first_name' => $fname,
+        ':last_name' => $lname,
+        ':id_num' => $idnum,
+        ':address' => $address,
+        ':city' => $city,
+        ':country' => $country,
+        ':balance' => $balacne
+        ]
+    );
+}
+
+
+## Read all accounts
+
+
+function read_account(){
+
+    global $PDO;
+
+    $select = $PDO->query("SELECT * FROM account");
+    echo `<table class=’table table-hover’><tr>`;
+    // Display table to user as a table form
+    foreach($select as $row) : ?>
+
+    <style>
+    table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    }
+    </style>
+
+    <table>
+        <tr>
+            <th>UID</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Password</th>
+            <th>First_name</th>
+            <th>Last_name</th>
+            <th>Id_num</th>
+            <th>Address</th>
+            <th>City</th>
+            <th>Country</th>
+            <th>Balance</th>
+            <th>Admin</th>
+        </tr>
+
+        <tr>
+            <td><?php echo $row['UID']; ?></td>
+            <td><?php echo $row['Email']; ?></td>
+            <td><?php echo $row['Phone']; ?></td>
+            <td><?php echo $row['Password']; ?></td>
+            <td><?php echo $row['First_name']; ?></td>
+            <td><?php echo $row['Last_name']; ?></td>
+            <td><?php echo $row['Id_num']; ?></td>
+            <td><?php echo $row['Address']; ?></td>
+            <td><?php echo $row['City']; ?></td>
+            <td><?php echo $row['Country']; ?></td>
+            <td><?php echo $row['Balance']; ?></td>
+            <td><?php echo $row['Admin']; ?></td>
+        </tr>
+
+    </table>
+
+    <?php endforeach;
+}
+
+## Update account
+
 
 function update_account(){
     global $PDO;
@@ -30,7 +249,7 @@ function update_account(){
 
     $result = $PDO->query("SELECT* FROM account");
     $_SESSION['UID_coulmn_check'] = false;
-
+    //Check uid and coulmn are exists on table
     $message = "UID doesn't exist";
     foreach ($result as $row){
         if($uid == $row["UID"] ){
@@ -49,7 +268,7 @@ function update_account(){
 
 
     $_SESSION['value_check'] = false;
-
+    // Check values are appropriate for coulmn
     if($_SESSION['UID_coulmn_check'] == true){
 
         switch ($coulmn){
@@ -107,7 +326,7 @@ function update_account(){
     echo "<meta http-equiv='refresh' content='3;url=admin_page.php?'>";
 
 
-    
+    // Update table if all information has no problem
     if($_SESSION['value_check']== true){
         $sth =$PDO->prepare("UPDATE account set $coulmn = :value where UID = :uid");
         $sth->execute(
@@ -127,221 +346,21 @@ function update_account(){
 }
 
 
-function read_account(){
+
+## Delete account from table
+
+function delete_account(){
 
     global $PDO;
-
-    $select = $PDO->query("SELECT * FROM account");
-    echo `<table class=’table table-hover’><tr>`;
-    foreach($select as $row) : ?>
-
-    <style>
-    table, th, td {
-    border: 1px solid black;
-    border-collapse: collapse;
-    }
-    </style>
-
-    <table>
-        <tr>
-            <th>UID</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Password</th>
-            <th>First_name</th>
-            <th>Last_name</th>
-            <th>Id_num</th>
-            <th>Address</th>
-            <th>City</th>
-            <th>Country</th>
-            <th>Balance</th>
-            <th>Admin</th>
-        </tr>
-
-        <tr>
-            <td><?php echo $row['UID']; ?></td>
-            <td><?php echo $row['Email']; ?></td>
-            <td><?php echo $row['Phone']; ?></td>
-            <td><?php echo $row['Password']; ?></td>
-            <td><?php echo $row['First_name']; ?></td>
-            <td><?php echo $row['Last_name']; ?></td>
-            <td><?php echo $row['Id_num']; ?></td>
-            <td><?php echo $row['Address']; ?></td>
-            <td><?php echo $row['City']; ?></td>
-            <td><?php echo $row['Country']; ?></td>
-            <td><?php echo $row['Balance']; ?></td>
-            <td><?php echo $row['Admin']; ?></td>
-        </tr>
-
-    </table>
-
-    <?php endforeach;
-}
-
-
-function add_account(){
-    
-    global $PDO;
-    $email = ($_POST['email']);
-    $phone = ($_POST['phone']);
-    $passwordR = ($_POST['password']);
-    $fname = ($_POST['fname']);
-    $lname = ($_POST['lname']);
-    $idnum = ($_POST['IDnum']);
-    $address = ($_POST['address']);
-    $city = ($_POST['city']);
-    $country = ($_POST['country']);
-    $balacne = 0;
-
-
-
-    $sth = $PDO->prepare("INSERT INTO account(`email`, `phone`, `password`, `first_name`, `last_name`, `id_num`, `address`, `city`, `country`, `balance`)
-         VALUES(:email, :phone , :password, :first_name, :last_name, :id_num, :address, :city, :country, :balance)");
-    $sth->execute(
-        [':email' => $email, 
-        ':phone' => $phone, 
-        ':password' => $passwordR,
-        ':first_name' => $fname,
-        ':last_name' => $lname,
-        ':id_num' => $idnum,
-        ':address' => $address,
-        ':city' => $city,
-        ':country' => $country,
-        ':balance' => $balacne
-        ]
-    );
-
+    extract($_POST);
+    $delete = $PDO->query("DELETE FROM account where UID = " . $uid);
+  
 
 }
 
-function ID_search(){
-    global $PDO;
-    $id = ($_POST['id']);
-    $password = ($_POST['password']);
-    $result = $PDO->query("SELECT* FROM account");
-   
-    
-    $message = "Id doesn't exist or wrong password";
-    foreach ($result as $row){
-        if($id === $row["Email"] && $password === $row["Password"]){
-            if($row["Admin"] == true){
-                $_SESSION['Loggedin'] = true;
-                $_SESSION['id'] = $id;
-                $_SESSION['password'] = $password;
-                header('location: admin_page.php');
-                break;
-
-            }
-            $_SESSION['Loggedin'] = true;
-            $_SESSION['id'] = $id;
-            $_SESSION['password'] = $password;
-            header('location: user_page.php');
-
-            break;
-            
-        }
-        else if($id === $row["Phone"] && $password === $row["Password"]){
-               
-                if($row["Admin"] == true){
-                    $_SESSION['Loggedin'] = true;
-                    $_SESSION['id'] = $id;
-                    $_SESSION['password'] = $password;
-                    header('location: admin_page.php');
-                    break;
-                }
-                $_SESSION['Loggedin'] = true;
-                $_SESSION['id'] = $id;
-                $_SESSION['password'] = $password;
-                header('location: user_page.php');
-                break;
-        }
-    }   
-    echo $message;
-    echo "<meta http-equiv='refresh' content='3;url=index.php?'>";
-}
 
 
-function Info_check(){
-    $message ="Please filled all information";
-    if(empty ($_POST['email'])){
-            echo $message;
-        }
-
-        else if (empty ($_POST['phone'])){
-            echo $message;
-        }
-
-        else if (empty ($_POST['password'])){
-            echo $message;
-        }
-
-        else if (empty ($_POST['password_check'])){
-            echo $message;
-        }
-
-        else if (empty ($_POST['fname'])){
-            echo $message;
-        }
-
-        else if (empty ($_POST['lname'])){
-            echo $message;
-        }
-
-        else if (empty ($_POST['IDnum'])){
-            echo $message;
-        }
-
-        // else if (empty ($_POST['profile_pic'])){
-        //     echo $message;
-        // }
-
-        else if (empty ($_POST['address'])){
-            echo $message;
-        }
-
-        else if (empty ($_POST['city'])){
-            echo $message;
-        }
-
-        else if (empty ($_POST['country'])){
-            echo $message;
-        }
-        else return true;
-
-    }
-
-
-function ID_register(){
-    $message ="";
-    $email = ($_POST['email']);
-    $phone = ($_POST['phone']);
-    $passwordR = ($_POST['password']);
-    $password_check = ($_POST['password_check']);
-    $fname = ($_POST['fname']);
-    $lname = ($_POST['lname']);
-
-if (filter_var($email, FILTER_VALIDATE_EMAIL) != true) {
-    $message = "Invalid Email";
-    }   
-    else if(is_numeric($phone) != true){
-        $message = "Please enter only phone number(without - and whitespace)";
-    }
-
-    else if($passwordR != $password_check){
-        $message = "Password and password confirmation do not match";
-    }
-
-    else if((!is_string($fname) && ($lname))){
-        $message = "Please enter only Alphabet on name fileds";
-    }
-    else  {
-        $message = "success";
-        $_SESSION['register_request'] = true;
-    }
-
-    echo $message;
-
-}
+## Display user's information
 
 
 function display_info(){
@@ -353,6 +372,7 @@ function display_info(){
             ':uid' => $uid
         ]
         );
+    // Display table to user as a table form
     foreach ($row as $user) :?>
 
         <style>
@@ -396,6 +416,8 @@ function display_info(){
         
 }
 
+
+// Update only balace of User
 function update_user_balance(){
     global $PDO;
     $uid = $_POST['uid'];
@@ -407,7 +429,9 @@ function update_user_balance(){
             ':uid' => $uid
         ]
     );
+    // check user is exists
     if($select -> rowCount() >0){
+        // check amount input is numeric 
         $amountNum = (int)$amount;
         if($amountNum > 0){
         $update = $PDO -> prepare("UPDATE account set Balance = :amount where UID = :uid;");
@@ -435,3 +459,4 @@ function update_user_balance(){
 
 
 ?>
+}

@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS branch(
 INSERT INTO branch values (1, 'Online bidding system', '702 Nguyen Van Linh, Tan Hung, Quan 7, Thanh pho Ho Chi Minh 700000', '0778139985');
 
 -- Table structure for table account
--- 수정
+
 CREATE TABLE IF NOT EXISTS account(
     Email varchar(200) NOT NULL,
     Phone varchar(30) NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS account(
 -- Dumping data is automatically executed in register.php page.
 
 -- Table structure for table bidding
--- 수정
+
 CREATE TABLE IF NOT EXISTS auction(
     AID INT NOT NULL,
     UID VARCHAR(30) NOT NULL,
@@ -53,7 +53,7 @@ ALTER TABLE auction
 ALTER TABLE auction
     MODIFY AID INT NOT NULL AUTO_INCREMENT;
 
--- 추가
+
 CREATE TABLE IF NOT EXISTS bidlist(
 	AID INT NOT NULL,
 	BID INT NOT NULL,
@@ -68,12 +68,32 @@ ALTER TABLE bidlist
     ADD PRIMARY KEY (BID, amount);
 ALTER TABLE bidlist
     MODIFY BID INT NOT NULL AUTO_INCREMENT;
+
+
+
+CREATE TABLE IF NOT EXISTS Transaction(
+	TID INT NOT NULL,
+	Deposit_UID INT NOT NULL,
+	Recipent_UID INT NOT NULL,
+	Amount float NOT NULL,
+    date_created datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+    UNIQUE(TID, Deposit_UID,Amount)
+    )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    
+ALTER TABLE Transaction
+    ADD PRIMARY KEY (TID, amount);
+ALTER TABLE Transaction
+    MODIFY TID INT NOT NULL AUTO_INCREMENT;
+
+
 -- Table structure for table category
 CREATE TABLE IF NOT EXISTS category(
                                        id INT NOT NULL,
                                        name VARCHAR(30) NOT NULL,
     UNIQUE(id, name)
     )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 
 -- Dumping data for table category
 INSERT INTO category VALUES(1, 'Sample Category'),
